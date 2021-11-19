@@ -1509,7 +1509,6 @@ public class SearchService extends AbstractLifecycleComponent implements IndexEv
 
         private void updateResourceTracking(SearchContext context) {
             if (context.resourceTracker() != null) {
-                context.resourceTracker().updateMetrics();
                 context.getTask().updateStat(TaskStatsType.MEMORY, context.resourceTracker().getMemoryAllocated());
                 context.getTask().updateStat(TaskStatsType.CPU, context.resourceTracker().getCpuTime());
 
@@ -1519,7 +1518,7 @@ public class SearchService extends AbstractLifecycleComponent implements IndexEv
                         context.getTask().getAction(),
                         context.request().source(),
                         context.indexShard(),
-                        context.resourceTracker().toString()
+                        context.getTask().getStats()
                     );
                 }
             }

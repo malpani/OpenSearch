@@ -23,19 +23,9 @@ public class ResourceTracker {
     static ThreadMXBean threadMXBean = (ThreadMXBean) ManagementFactory.getThreadMXBean();
     long startingAllocatedBytes;
     long startingCPUTime;
-    long memoryAllocated;
-    long cpuTime;
 
     public ResourceTracker() {
         reset();
-    }
-
-    /**
-     * Takes current snapshot of resource usage by thread since the creation of this object
-     */
-    public void updateMetrics() {
-        this.memoryAllocated = threadMXBean.getThreadAllocatedBytes(Thread.currentThread().getId()) - startingAllocatedBytes;
-        this.cpuTime = threadMXBean.getCurrentThreadCpuTime() - startingCPUTime;
     }
 
     /**
@@ -44,28 +34,21 @@ public class ResourceTracker {
     public void reset() {
         this.startingCPUTime = threadMXBean.getCurrentThreadCpuTime();
         this.startingAllocatedBytes = threadMXBean.getThreadAllocatedBytes(Thread.currentThread().getId());
-        this.memoryAllocated = 0;
-        this.cpuTime = 0;
     }
 
     /**
-     * Tracks CPU usage by the current thread
+     * Tracks CPU usage by the current thread since object was created/reset
      * @return cpu time in nanoseconds
      */
     public long getCpuTime() {
-        return this.cpuTime;
+        return threadMXBean.getCurrentThreadCpuTime() - this.startingCPUTime;
     }
 
     /**
-     * Returns memory allocated by the thread between object creation and last update of metrics
+     * Returns memory allocated by the thread since object was created/reset
      * @return memory allocated in bytes
      */
     public long getMemoryAllocated() {
-        return this.memoryAllocated;
-    }
-
-    @Override
-    public String toString() {
-        return "resource_tracker[memoryAllocatedBytes=" + memoryAllocated + ",cpuTime=" + cpuTime + "]";
+        return threadMXBean.getThreadAllocatedBytes(Thread.currentThread().getId()) - this.startingAllocatedBytes;
     }
 }
